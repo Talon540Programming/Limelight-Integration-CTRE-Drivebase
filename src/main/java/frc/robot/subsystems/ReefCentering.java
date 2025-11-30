@@ -101,6 +101,14 @@ public class ReefCentering {
 
         return AutoBuilder.followPath(path);
     }
+    //going to have to look into the drivetrain methods / make some
+    private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
+        if (drivetrain.getVelocityMagnitude().in(MetersPerSecond) < 0.25) {
+            var diff = target.minus(drivetrain.getPose()).getTranslation();
+            return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();
+        }
+        return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
+      }
 
     public Command createPathCommand(Side side){
         return Commands.defer(()-> {
