@@ -44,7 +44,7 @@ public class RobotContainer {
 
   
   private void configureBindings() {
-    m_driverController.start().onTrue(Commands.runOnce(driveBase::zeroGyro));
+    Commands.runOnce(drivetrain::seedFieldCentric);
     m_driverController.povUp().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Middle).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
     m_driverController.leftBumper().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Left).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
     m_driverController.rightBumper().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Right).until(() -> reefCentering.haveConditionsChanged()).repeatedly());

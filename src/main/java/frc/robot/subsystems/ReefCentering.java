@@ -76,10 +76,7 @@ public class ReefCentering {
     public boolean haveConditionsChanged(){
         Pose2d nearSide = calculateNearestSide();
         
-        if(nearSide != nearestReefSide){
-            return true;
-        }
-        return false;
+        return !nearSide.equals(nearestReefSide);
     }
 
     private Command getPathFromWaypoint(Pose2d waypoint){

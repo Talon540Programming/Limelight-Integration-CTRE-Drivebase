@@ -1,0 +1,23 @@
+// Add these after CTRE generates the file:
+
+public Pose2d getPose() {
+    return getState().Pose;
+}
+
+public Rotation2d getHeading() {
+    return getState().Pose.getRotation();
+}
+
+public ChassisSpeeds getFieldVelocity() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(
+        getState().Speeds, 
+        getHeading()
+    );
+}
+
+public LinearVelocity getVelocityMagnitude() {
+    ChassisSpeeds cs = getFieldVelocity();
+    return MetersPerSecond.of(Math.hypot(cs.vxMetersPerSecond, cs.vyMetersPerSecond));
+}
+
+these methods need to be added to the swerve drive class when added from CTRE
