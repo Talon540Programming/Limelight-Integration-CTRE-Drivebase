@@ -13,7 +13,6 @@ public interface VisionIO {
         public double timestamp = 0.0;
         public int seenTagCount = 0;
         public boolean isRedAlliance = false;
-
     }
 
     default void updateVisionIOInputs(VisionIOInputs io){}

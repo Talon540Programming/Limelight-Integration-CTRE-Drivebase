@@ -21,7 +21,6 @@ public class VisionBase extends SubsystemBase{
         this.drivetrain = drivetrain;
     }
 
-
     @Override
     public void periodic(){
 
@@ -55,6 +54,4 @@ public class VisionBase extends SubsystemBase{
     public boolean isRedAlliance() {
         return input.isRedAlliance;
     }
-
-
 }

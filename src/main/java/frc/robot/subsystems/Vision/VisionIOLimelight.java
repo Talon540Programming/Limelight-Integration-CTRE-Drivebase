@@ -37,11 +37,6 @@ public class VisionIOLimelight implements VisionIO {
         }
     }
     
-  
-        
-
-        //adds the stored value of limelight pose estimation to odometry if tag is seen
-
     @Override
     public void updateLimelightYaw(CommandSwerveDrivetrain drivetrain) {
     LimelightHelpers.SetRobotOrientation(
