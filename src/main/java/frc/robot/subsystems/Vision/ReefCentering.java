@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Vision;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
@@ -25,6 +25,7 @@ import frc.robot.Constants.FieldPoses;
 public class ReefCentering {
 
     private final CommandSwerveDrivetrain drivetrain;
+    private VisionIOLimelight vision;
     private Pose2d nearestReefSide = new Pose2d();
 
     public enum Side{
@@ -38,7 +39,7 @@ public class ReefCentering {
     }
 
     public Pose2d calculateNearestSide(){
-        if(VisionSubsystem.isRedAlliance()){
+        if(vision.isRedAlliance()){
             return drivetrain.getPose().nearest(FieldPoses.redReefPoses);
         }
         else{
