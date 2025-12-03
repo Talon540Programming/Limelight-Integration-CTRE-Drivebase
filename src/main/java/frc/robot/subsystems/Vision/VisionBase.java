@@ -10,7 +10,15 @@ import frc.robot.LimelightHelpers;
 
 public class VisionBase extends SubsystemBase{
 
-    VisionIO vision;
+    private final VisionIO vision;
+    private final CommandSwerveDrivetrain drivetrain;
+
+
+    public VisionBase(VisionIO vision, CommandSwerveDrivetrain drivetrain) {
+        this.vision = vision;
+        this.drivetrain = drivetrain;
+    }
+
 
     @Override
     public void periodic(){

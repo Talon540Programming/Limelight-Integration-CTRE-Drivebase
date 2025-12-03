@@ -40,8 +40,6 @@ public class VisionIOLimelight implements VisionIO {
     //will work once CTRE code is put in
     @Override
     public void updatePoseEstimatorMT2(CommandSwerveDrivetrain drivetrain){
-        String camera = limelightName;
-
         //stores the current pose estimate from the limelight
         LimelightHelpers.PoseEstimate metaTag2Pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
 
@@ -55,21 +53,11 @@ public class VisionIOLimelight implements VisionIO {
 
     @Override
     public void updateLimelightYaw(CommandSwerveDrivetrain drivetrain) {
-        double[] stddevs = NetworkTableInstance.getDefault().getTable(limelightName)
-                            .getEntry("stddevs").getDoubleArray(new double[12]);
-        double LL2yaw = LimelightHelpers.getIMUData(limelightName).Yaw;
-        NetworkTableInstance.getDefault().getTable("Limelight stuff").getEntry("Stddevs").setDoubleArray(stddevs);
-        NetworkTableInstance.getDefault().getTable("Limelight stuff").getEntry("Stddevs[5]").setDouble(stddevs[5]);
-        NetworkTableInstance.getDefault().getTable("Limelight stuff").getEntry("LL2 Yaw").setDouble(LL2yaw);
-
-        //If limelight is unstable then update bassed off gyro, might remove 
-        if(stddevs[5] < 1.5){
-            LimelightHelpers.SetRobotOrientation(limelightName, LimelightHelpers.getBotPose2d_wpiBlue(limelightName).getRotation().getDegrees(),0,0,0,0,0);
-        }
-        //might have to change getPose depending on what CTRE has TBD
-        else{
-            LimelightHelpers.SetRobotOrientation(limelightName, drivetrain.getPose().getRotation().getDegrees(),0,0,0,0,0);
-        }
+    LimelightHelpers.SetRobotOrientation(
+        limelightName,
+        drivetrain.getPose().getRotation().getDegrees(),
+        0, 0, 0, 0, 0
+    );
     }
 
 }
