@@ -11,44 +11,36 @@ public class VisionIOLimelight implements VisionIO {
         //sets mode for Metatag 2 and mode 0 uses robot gyro for orentation 
         LimelightHelpers.SetIMUMode(limelightName, 0);
     }
+    public void updateVisionIOInputs(VisionIOInputs input){
+         input.hasTarget = LimelightHelpers.getTV(limelightName);
+         input.limelightTX = LimelightHelpers.getTX(limelightName);
+         input.limelightTY = LimelightHelpers.getTY(limelightName);
+         input.limelightTA = LimelightHelpers.getTA(limelightName);
 
-    @Override
-    public boolean getTV(){
-        return LimelightHelpers.getTV(limelightName);
-    }
-
-    @Override
-    public double getTX(){
-        return LimelightHelpers.getTX(limelightName);
-    }
-
-    @Override
-    public double getTA(){
-        return LimelightHelpers.getTA(limelightName);
-    }
-
-    @Override
-    public boolean isRedAlliance(){
         var alliance = DriverStation.getAlliance();
-        if(alliance.isPresent()){
-            return alliance.get() == DriverStation.Alliance.Red;
+        if(!alliance.isEmpty() && alliance.get() == DriverStation.Alliance.Red){
+            input.isRedAlliance = true;
         }
-        return false;
-    }
-    
-    //will work once CTRE code is put in
-    @Override
-    public void updatePoseEstimatorMT2(CommandSwerveDrivetrain drivetrain){
-        //stores the current pose estimate from the limelight
+        else if(!alliance.isEmpty() && alliance.get() == DriverStation.Alliance.Blue){
+            input.isRedAlliance = false;
+        }
+
         LimelightHelpers.PoseEstimate metaTag2Pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
 
-        //adds the stored value of limelight pose estimation to odometry if tag is seen
         if(metaTag2Pose != null){
-            if(metaTag2Pose.tagCount > 0){
-                drivetrain.addVisionMeasurement(metaTag2Pose.pose, metaTag2Pose.timestampSeconds);
-            }
+            input.pose = metaTag2Pose.pose;
+            input.timestamp = metaTag2Pose.timestampSeconds;
+            input.seenTagCount = metaTag2Pose.tagCount;
+        }
+        else{
+            input.seenTagCount = 0;
         }
     }
+    
+  
+        
+
+        //adds the stored value of limelight pose estimation to odometry if tag is seen
 
     @Override
     public void updateLimelightYaw(CommandSwerveDrivetrain drivetrain) {

@@ -7,10 +7,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.subsystems.Vision.VisionIO.VisionIOInputs;
 
 public class VisionBase extends SubsystemBase{
 
     private final VisionIO vision;
+    private final VisionIOInputs input = new VisionIOInputs();
     private final CommandSwerveDrivetrain drivetrain;
 
 
@@ -24,24 +26,35 @@ public class VisionBase extends SubsystemBase{
     public void periodic(){
 
     vision.updateLimelightYaw(drivetrain);
-    vision.updatePoseEstimatorMT2(drivetrain);
+    vision.updateVisionIOInputs(input);
 
-    //called once per scheduler run
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx");
-    NetworkTableEntry ty = table.getEntry("ty");
-    
-    //read values periodically
-    double x = tx.getDouble(0.0);
-    double y = ty.getDouble(0.0);
-    
-    //post to smart dashboard periodically
-    SmartDashboard.putNumber("LimelightX", x);
-    SmartDashboard.putNumber("LimelightY", y);
-    SmartDashboard.putNumber("LimelightArea", LimelightHelpers.getTA(Constants.kLimelightName));
-    SmartDashboard.putNumber("Limelight'X'", vision.getTX());
-
-
-
+    if(input.seenTagCount > 0){
+        drivetrain.addVisionMeasurement(input.pose, input.timestamp);
     }
+
+    SmartDashboard.putBoolean("Vision/HasTarget", input.hasTarget);
+        SmartDashboard.putNumber("Vision/TX", input.limelightTX);
+        SmartDashboard.putNumber("Vision/TY", input.limelightTY);
+        SmartDashboard.putNumber("Vision/TA", input.limelightTA);
+        SmartDashboard.putNumber("Vision/TagCount", input.seenTagCount);
+        SmartDashboard.putBoolean("Vision/IsRedAlliance", input.isRedAlliance);
+    }
+
+    public VisionIOInputs getVisionIOInputs(){
+        return input;
+    }
+
+    public boolean hasTarget() {
+        return input.hasTarget;
+    }
+    
+    public double getTX() {
+        return input.limelightTX;
+    }
+    
+    public boolean isRedAlliance() {
+        return input.isRedAlliance;
+    }
+
+
 }

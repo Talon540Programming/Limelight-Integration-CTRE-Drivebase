@@ -25,7 +25,7 @@ import frc.robot.Constants.FieldPoses;
 public class ReefCentering {
 
     private final CommandSwerveDrivetrain drivetrain;
-    private VisionIO vision;
+    private VisionBase vision;
     private Pose2d nearestReefSide = new Pose2d();
 
     public enum Side{
@@ -34,7 +34,7 @@ public class ReefCentering {
         Right
     }
 
-    public ReefCentering(CommandSwerveDrivetrain drivetrain, VisionIO vision){
+    public ReefCentering(CommandSwerveDrivetrain drivetrain,VisionBase vision){
         this.drivetrain = drivetrain;
         this.vision = vision;
     }
@@ -70,9 +70,7 @@ public class ReefCentering {
             break;
         }
 
-        Pose2d targetPose = new Pose2d(x, y, new Rotation2d(rot));
-        return targetPose;
-
+         return new Pose2d(x, y, new Rotation2d(rot));
     }  
 
     public boolean haveConditionsChanged(){
