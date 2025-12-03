@@ -9,7 +9,6 @@ import frc.robot.commands.Autos;
 import frc.robot.subsystems.Vision.ReefCentering;
 import frc.robot.subsystems.Vision.VisionBase;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
-import frc.robot.subsystems.Vision.VisionSubsystem;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -30,7 +29,7 @@ public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = new CommandSwerveDrivetrain();
   private final VisionIOLimelight visionIO = new VisionIOLimelight();
   private final VisionBase vision = new VisionBase(visionIO, drivetrain);
-  private ReefCentering reefCentering = new ReefCentering(drivetrain);
+  private ReefCentering reefCentering = new ReefCentering(drivetrain, visionIO);
 
   private final SendableChooser<Command> autoChooser;
 

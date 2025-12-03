@@ -2,9 +2,6 @@ package frc.robot.subsystems.Vision;
 
 
 public interface VisionIO {
-    public static class VisionInputs{
-        public boolean isRedAlliance;
-    }
     default boolean getTV(){
         return false;
     }

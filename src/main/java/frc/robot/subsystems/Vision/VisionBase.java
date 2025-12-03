@@ -22,6 +22,10 @@ public class VisionBase extends SubsystemBase{
 
     @Override
     public void periodic(){
+
+    vision.updateLimelightYaw(drivetrain);
+    vision.updatePoseEstimatorMT2(drivetrain);
+
     //called once per scheduler run
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
     NetworkTableEntry tx = table.getEntry("tx");
