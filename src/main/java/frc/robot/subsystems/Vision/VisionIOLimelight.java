@@ -31,7 +31,7 @@ public class VisionIOLimelight implements VisionIO {
 
         if(metaTag2Pose != null){
             input.pose = metaTag2Pose.pose;
-            input.timestamp = metaTag2Pose.timestampSeconds;
+            input.limelightTimestamp = metaTag2Pose.timestampSeconds;
             input.seenTagCount = metaTag2Pose.tagCount;
         }
         else{

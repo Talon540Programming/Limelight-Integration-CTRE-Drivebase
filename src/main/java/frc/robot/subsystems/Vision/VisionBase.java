@@ -12,7 +12,7 @@ import frc.robot.subsystems.Vision.VisionIO.VisionIOInputs;
 public class VisionBase extends SubsystemBase{
 
     private final VisionIO vision;
-    private final VisionIOInputs input = new VisionIOInputs();
+    private final VisionIOInputs limelight = new VisionIOInputs();
     private final CommandSwerveDrivetrain drivetrain;
 
 
@@ -25,33 +25,33 @@ public class VisionBase extends SubsystemBase{
     public void periodic(){
 
     vision.updateLimelightYaw(drivetrain);
-    vision.updateVisionIOInputs(input);
+    vision.updateVisionIOInputs(limelight);
 
-    if(input.seenTagCount > 0){
-        drivetrain.addVisionMeasurement(input.pose, input.timestamp);
+    if(limelight.seenTagCount > 0 && limelight.hasTarget){
+        drivetrain.addVisionMeasurement(limelight.pose, limelight.limelightTimestamp);
     }
 
-    SmartDashboard.putBoolean("Vision/HasTarget", input.hasTarget);
-        SmartDashboard.putNumber("Vision/TX", input.limelightTX);
-        SmartDashboard.putNumber("Vision/TY", input.limelightTY);
-        SmartDashboard.putNumber("Vision/TA", input.limelightTA);
-        SmartDashboard.putNumber("Vision/TagCount", input.seenTagCount);
-        SmartDashboard.putBoolean("Vision/IsRedAlliance", input.isRedAlliance);
+    SmartDashboard.putBoolean("Vision/HasTarget", limelight.hasTarget);
+        SmartDashboard.putNumber("Vision/TX", limelight.limelightTX);
+        SmartDashboard.putNumber("Vision/TY", limelight.limelightTY);
+        SmartDashboard.putNumber("Vision/TA", limelight.limelightTA);
+        SmartDashboard.putNumber("Vision/TagCount", limelight.seenTagCount);
+        SmartDashboard.putBoolean("Vision/IsRedAlliance", limelight.isRedAlliance);
     }
 
     public VisionIOInputs getVisionIOInputs(){
-        return input;
+        return limelight;
     }
 
     public boolean hasTarget() {
-        return input.hasTarget;
+        return limelight.hasTarget;
     }
     
     public double getTX() {
-        return input.limelightTX;
+        return limelight.limelightTX;
     }
     
     public boolean isRedAlliance() {
-        return input.isRedAlliance;
+        return limelight.isRedAlliance;
     }
 }
