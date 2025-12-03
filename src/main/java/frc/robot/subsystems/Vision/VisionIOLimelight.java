@@ -11,6 +11,8 @@ public class VisionIOLimelight implements VisionIO {
         //sets mode for Metatag 2 and mode 0 uses robot gyro for orentation 
         LimelightHelpers.SetIMUMode(limelightName, 0);
     }
+
+    @Override
     public void updateVisionIOInputs(VisionIOInputs input){
          input.hasTarget = LimelightHelpers.getTV(limelightName);
          input.limelightTX = LimelightHelpers.getTX(limelightName);
@@ -36,7 +38,7 @@ public class VisionIOLimelight implements VisionIO {
             input.seenTagCount = 0;
         }
     }
-    
+
     @Override
     public void updateLimelightYaw(CommandSwerveDrivetrain drivetrain) {
     LimelightHelpers.SetRobotOrientation(

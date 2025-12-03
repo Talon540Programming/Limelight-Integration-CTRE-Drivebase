@@ -29,7 +29,7 @@ public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = new CommandSwerveDrivetrain();
   private final VisionIOLimelight visionIO = new VisionIOLimelight();
   private final VisionBase vision = new VisionBase(visionIO, drivetrain);
-  private ReefCentering reefCentering = new ReefCentering(drivetrain, visionIO);
+  private ReefCentering reefCentering = new ReefCentering(drivetrain, vision);
 
   private final SendableChooser<Command> autoChooser;
 
@@ -46,7 +46,7 @@ public class RobotContainer {
 
   
   private void configureBindings() {
-    Commands.runOnce(drivetrain::seedFieldCentric);
+    m_driverController.start().onTrue(Commands.runOnce(drivetrain::seedFieldCentric));
     m_driverController.povUp().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Middle).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
     m_driverController.leftBumper().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Left).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
     m_driverController.rightBumper().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Right).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
