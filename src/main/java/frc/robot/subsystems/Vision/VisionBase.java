@@ -1,5 +1,8 @@
 package frc.robot.subsystems.Vision;
 
+import org.littletonrobotics.junction.Logger;
+
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -29,14 +32,8 @@ public class VisionBase extends SubsystemBase{
 
     if(limelight.seenTagCount > 0 && limelight.hasTarget){
         drivetrain.addVisionMeasurement(limelight.pose, limelight.limelightTimestamp);
-    }
-
-    SmartDashboard.putBoolean("Vision/HasTarget", limelight.hasTarget);
-        SmartDashboard.putNumber("Vision/TX", limelight.limelightTX);
-        SmartDashboard.putNumber("Vision/TY", limelight.limelightTY);
-        SmartDashboard.putNumber("Vision/TA", limelight.limelightTA);
-        SmartDashboard.putNumber("Vision/TagCount", limelight.seenTagCount);
-        SmartDashboard.putBoolean("Vision/IsRedAlliance", limelight.isRedAlliance);
+    }   
+        Logger.recordOutput("Vision/EstimatedPose", limelight.pose);
     }
 
     public VisionIOInputs getVisionIOInputs(){

@@ -1,9 +1,12 @@
 package frc.robot.subsystems.Vision;
 
+import org.littletonrobotics.junction.AutoLog;
+
 import edu.wpi.first.math.geometry.Pose2d;
 
 public interface VisionIO {
 
+    @AutoLog
     public static class VisionIOInputs{
         public boolean hasTarget = false;
         public double limelightTX = 0.0;

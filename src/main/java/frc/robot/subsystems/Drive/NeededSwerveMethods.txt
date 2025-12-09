@@ -20,4 +20,7 @@ public LinearVelocity getVelocityMagnitude() {
     return MetersPerSecond.of(Math.hypot(cs.vxMetersPerSecond, cs.vyMetersPerSecond));
 }
 
+Logger.recordOutput("Odometry/Robot", currentPose);
+logs the pose of the robot for 3d field 
+
 these methods need to be added to the swerve drive class when added from CTRE
