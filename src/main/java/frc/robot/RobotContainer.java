@@ -52,7 +52,8 @@ public class RobotContainer {
   private void configureBindings() {
     m_driverController.povDown().onTrue(Commands.runOnce(autoHeading::toggleAutoHeading));
     m_driverController.start().onTrue(Commands.runOnce(drivetrain::seedFieldCentric));
-    
+    m_driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
+
     m_driverController.povUp().whileTrue(
     Commands.runOnce(() -> autoHeading.disableIfConflicting(
         reefCentering.getTargetRotation(ReefCentering.Side.Middle)))

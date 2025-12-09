@@ -23,4 +23,45 @@ public LinearVelocity getVelocityMagnitude() {
 Logger.recordOutput("Odometry/Robot", currentPose);
 logs the pose of the robot for 3d field 
 
+// Add this request if not already present in CTRE template
+private final SwerveRequest.FieldCentricFacingAngle headingDrive = 
+    new SwerveRequest.FieldCentricFacingAngle()
+        .withDeadband(MaxSpeed * 0.1)
+        .withRotationalDeadband(MaxAngularRate * 0.1)
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+// Brake request - X-pattern wheel lock
+private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
+// In constructor, configure heading controller:
+headingDrive.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+makes it so that it takes the smallest way to get to angle 
+
+// Modified default command:
+drivetrain.setDefaultCommand(
+    drivetrain.run(() -> {
+        double xSpeed = -m_driverController.getLeftY();
+        double ySpeed = -m_driverController.getLeftX();
+        double rotSpeed = -m_driverController.getRightX();
+        
+        if (autoHeading.isEnabled() && !autoHeading.isDriverRotating(rotSpeed)) {
+            autoHeading.updateTargetHeading(drivetrain.getState().Pose);
+            
+            drivetrain.setControl(
+                headingDrive
+                    .withVelocityX(xSpeed * MaxSpeed)
+                    .withVelocityY(ySpeed * MaxSpeed)
+                    .withTargetDirection(autoHeading.getTargetHeading())
+            );
+        } else {
+            drivetrain.setControl(
+                drive
+                    .withVelocityX(xSpeed * MaxSpeed)
+                    .withVelocityY(ySpeed * MaxSpeed)
+                    .withRotationalRate(rotSpeed * MaxAngularRate)
+            );
+        }
+    })
+);
+
 these methods need to be added to the swerve drive class when added from CTRE
