@@ -12,6 +12,9 @@ import frc.robot.subsystems.Vision.VisionIOLimelight;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import frc.robot.subsystems.Drive.AutoHeading;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,6 +33,7 @@ public class RobotContainer {
   private final VisionIOLimelight visionIO = new VisionIOLimelight();
   private final VisionBase vision = new VisionBase(visionIO, drivetrain);
   private ReefCentering reefCentering = new ReefCentering(drivetrain, vision);
+  private final AutoHeading autoHeading = new AutoHeading(vision);
 
   private final SendableChooser<Command> autoChooser;
 
@@ -46,11 +50,30 @@ public class RobotContainer {
 
   
   private void configureBindings() {
+    m_driverController.povDown().onTrue(Commands.runOnce(autoHeading::toggleAutoHeading));
     m_driverController.start().onTrue(Commands.runOnce(drivetrain::seedFieldCentric));
-    m_driverController.povUp().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Middle).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
-    m_driverController.leftBumper().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Left).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
-    m_driverController.rightBumper().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Right).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
-
+    
+    m_driverController.povUp().whileTrue(
+    Commands.runOnce(() -> autoHeading.disableIfConflicting(
+        reefCentering.getTargetRotation(ReefCentering.Side.Middle)))
+        .andThen(reefCentering.createPathCommand(ReefCentering.Side.Middle)
+            .until(() -> reefCentering.haveConditionsChanged())
+            .repeatedly())
+    );
+    m_driverController.leftBumper().whileTrue(
+        Commands.runOnce(() -> autoHeading.disableIfConflicting(
+            reefCentering.getTargetRotation(ReefCentering.Side.Left)))
+            .andThen(reefCentering.createPathCommand(ReefCentering.Side.Left)
+                .until(() -> reefCentering.haveConditionsChanged())
+                .repeatedly())
+    );
+    m_driverController.rightBumper().whileTrue(
+        Commands.runOnce(() -> autoHeading.disableIfConflicting(
+            reefCentering.getTargetRotation(ReefCentering.Side.Right)))
+            .andThen(reefCentering.createPathCommand(ReefCentering.Side.Right)
+                .until(() -> reefCentering.haveConditionsChanged())
+                .repeatedly())
+    );
   }
 
   public Command getAutonomousCommand() {
