@@ -52,7 +52,7 @@ public class AutoHeading extends SubsystemBase{
             vision.isRedAlliance() ? FieldPoses.redReefPoses : FieldPoses.blueReefPoses
         );
 
-        targetHeading = nearestReefFace.getRotation();
+        targetHeading = nearestReefFace.getRotation().plus(Rotation2d.fromDegrees(180));
 
         Logger.recordOutput("AutoHeading/TargetHeading", targetHeading.getDegrees());
         Logger.recordOutput("AutoHeading/NearestReefFace", nearestReefFace);

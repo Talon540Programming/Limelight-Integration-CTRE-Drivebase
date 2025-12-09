@@ -54,8 +54,8 @@ public class ReefCentering {
     }
 
     private Pose2d calculatePath(Side side, Pose2d nearestSide){
-        double x = nearestReefSide.getX();
-        double y = nearestReefSide.getY();
+        double x = nearestSide.getX();
+        double y = nearestSide.getY();
         double rot = nearestSide.getRotation().getRadians();
         //tune value with more testing, rotational offset 
         rot += Math.toRadians(0);
@@ -75,7 +75,7 @@ public class ReefCentering {
             break;
         }
 
-         return new Pose2d(x, y, new Rotation2d(rot));
+         return new Pose2d(x, y, new Rotation2d(rot + Math.PI));
     }  
 
     public boolean haveConditionsChanged(){
