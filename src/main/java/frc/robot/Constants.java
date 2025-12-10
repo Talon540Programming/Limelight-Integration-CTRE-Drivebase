@@ -79,7 +79,7 @@ public final class Constants {
       add(new Pose2d(13.861, 5.408, new Rotation2d(Units.degreesToRadians(240.0))));
       add(new Pose2d(12.265, 5.408, new Rotation2d(Units.degreesToRadians(300.0))));
     }};
-
+    
     public static final double Offset = 0.165;
   }
 }
