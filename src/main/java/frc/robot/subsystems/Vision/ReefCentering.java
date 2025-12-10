@@ -28,6 +28,9 @@ public class ReefCentering {
     private VisionBase vision;
     private Pose2d nearestReefSide = new Pose2d();
 
+    private double lateralOffset = FieldPoses.lateralOffset.get();
+    private double distanceOffset = FieldPoses.distanceOffset.get();
+
     public enum Side{
         Left,
         Middle,
@@ -62,18 +65,21 @@ public class ReefCentering {
 
         switch (side) {
             case Left:
-                x -= FieldPoses.Offset * Math.sin(rot);
-                y += FieldPoses.Offset * Math.cos(rot);
+                x -= lateralOffset * Math.sin(rot);
+                y += lateralOffset * Math.cos(rot);
             break;
             case Right:
-                x += FieldPoses.Offset * Math.sin(rot);
-                y -= FieldPoses.Offset * Math.cos(rot);
+                x += lateralOffset * Math.sin(rot);
+                y -= lateralOffset * Math.cos(rot);
             break;
             case Middle:
                default:
 
             break;
         }
+
+        x += distanceOffset * Math.cos(rot);
+        y += distanceOffset * Math.sin(rot);
 
          return new Pose2d(x, y, new Rotation2d(rot));
     }  

@@ -7,6 +7,8 @@ package frc.robot;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -80,6 +82,10 @@ public final class Constants {
       add(new Pose2d(12.265, 5.408, new Rotation2d(Units.degreesToRadians(300.0))));
     }};
     
-    public static final double Offset = 0.165;
+    public static LoggedNetworkNumber lateralOffset = 
+        new LoggedNetworkNumber("ReefAlign/LateralOffset", 0.165);
+    public static LoggedNetworkNumber distanceOffset = 
+        new LoggedNetworkNumber("ReefAlign/DistanceOffset", 0.2);
+
   }
 }
