@@ -69,6 +69,18 @@
           "data": {
             "pathName": "L4 3 to Station"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.15
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Station to L4 4"
+          }
         }
       ]
     }
