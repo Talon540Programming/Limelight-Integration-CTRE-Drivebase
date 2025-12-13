@@ -11,7 +11,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Vision.VisionBase;
 
 
-public class AutoHeading extends SubsystemBase{
+public class SetReefSideHeading extends SubsystemBase{
 
     private final VisionBase vision;
 
@@ -19,7 +19,7 @@ public class AutoHeading extends SubsystemBase{
     private Rotation2d targetHeading = new Rotation2d();
     private Pose2d nearestReefFace = new Pose2d();
 
-    public AutoHeading(VisionBase vision){
+    public SetReefSideHeading(VisionBase vision){
         this.vision = vision;
     }
 

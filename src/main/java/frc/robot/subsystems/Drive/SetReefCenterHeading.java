@@ -9,14 +9,14 @@ import frc.robot.Constants.FieldPoses;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Vision.VisionBase;
 
-public class FaceReefCenter extends SubsystemBase {
+public class SetReefCenterHeading extends SubsystemBase {
 
     private final VisionBase vision;
     
     private boolean faceReefEnabled = false;
     private Rotation2d targetHeading = new Rotation2d();
 
-    public FaceReefCenter(VisionBase vision) {
+    public SetReefCenterHeading(VisionBase vision) {
         this.vision = vision;
     }
 

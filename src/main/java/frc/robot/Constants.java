@@ -65,27 +65,42 @@ public final class Constants {
     public static final Pose2d redCenterOfReef = new Pose2d(13.065, 4.025, new Rotation2d()); // red
 
     public static final List<Pose2d> blueReefPoses = new ArrayList<Pose2d>(){{
-      add(new Pose2d(2.890, 4.025, new Rotation2d(Units.degreesToRadians(0))));
-      add(new Pose2d(3.689, 2.642, new Rotation2d(Units.degreesToRadians(60.0))));
-      add(new Pose2d(5.285, 2.642, new Rotation2d(Units.degreesToRadians(120.0))));
-      add(new Pose2d(6.087, 4.025, new Rotation2d(Units.degreesToRadians(180.0))));
-      add(new Pose2d(5.285, 5.408, new Rotation2d(Units.degreesToRadians(240.0))));
-      add(new Pose2d(3.689, 5.408, new Rotation2d(Units.degreesToRadians(300.0))));
+      add(new Pose2d(3.301, 4.026, new Rotation2d(Units.degreesToRadians(0))));      // Face 0 - Left
+      add(new Pose2d(3.896, 2.999, new Rotation2d(Units.degreesToRadians(60.0))));   // Face 1
+      add(new Pose2d(5.082, 2.999, new Rotation2d(Units.degreesToRadians(120.0))));  // Face 2
+      add(new Pose2d(5.675, 4.026, new Rotation2d(Units.degreesToRadians(180.0))));  // Face 3 - Right
+      add(new Pose2d(5.082, 5.053, new Rotation2d(Units.degreesToRadians(240.0))));  // Face 4
+      add(new Pose2d(3.896, 5.053, new Rotation2d(Units.degreesToRadians(300.0))));  // Face 5
     }};
 
-    public static final List<Pose2d> redReefPoses = new ArrayList<Pose2d>(){{
-      add(new Pose2d(11.466, 4.025, new Rotation2d(Units.degreesToRadians(0))));
-      add(new Pose2d(12.265, 2.642, new Rotation2d(Units.degreesToRadians(60.0))));
-      add(new Pose2d(13.861, 2.642, new Rotation2d(Units.degreesToRadians(120.0))));
-      add(new Pose2d(14.663, 4.025, new Rotation2d(Units.degreesToRadians(180.0))));
-      add(new Pose2d(13.861, 5.408, new Rotation2d(Units.degreesToRadians(240.0))));
-      add(new Pose2d(12.265, 5.408, new Rotation2d(Units.degreesToRadians(300.0))));
+    public static final List<Pose2d> blueCoralStations = new ArrayList<Pose2d>(){{
+      add(new Pose2d(1.346, 7.048, new Rotation2d(Units.degreesToRadians(148)))); // Left Coral Station
+      add(new Pose2d(0.851, 7.396, new Rotation2d(Units.degreesToRadians(306)))); // Right Coral Station
     }};
+  
+  public static final List<Pose2d> redReefPoses = new ArrayList<Pose2d>(){{
+      add(new Pose2d(11.877, 4.026, new Rotation2d(Units.degreesToRadians(0))));     // Face 0
+      add(new Pose2d(12.472, 2.999, new Rotation2d(Units.degreesToRadians(60.0))));  // Face 1
+      add(new Pose2d(13.658, 2.999, new Rotation2d(Units.degreesToRadians(120.0)))); // Face 2
+      add(new Pose2d(14.251, 4.026, new Rotation2d(Units.degreesToRadians(180.0)))); // Face 3
+      add(new Pose2d(13.658, 5.053, new Rotation2d(Units.degreesToRadians(240.0)))); // Face 4
+      add(new Pose2d(12.472, 5.053, new Rotation2d(Units.degreesToRadians(300.0)))); // Face 5
+  }};
+
+  public static final List<Pose2d> redCoralStations = new ArrayList<Pose2d>(){{
+    add(new Pose2d(16.697, 0.655, new Rotation2d(Units.degreesToRadians(54)))); // Left Coral Station
+    add(new Pose2d(16.697, 7.396, new Rotation2d(Units.degreesToRadians(306)))); // Right Coral Station
+  }};
+
+
+  
     
     public static LoggedNetworkNumber lateralOffset = 
         new LoggedNetworkNumber("ReefAlign/LateralOffset", 0.2);
     public static LoggedNetworkNumber distanceOffset = 
-        new LoggedNetworkNumber("ReefAlign/DistanceOffset", 0.2);
+        new LoggedNetworkNumber("ReefAlign/DistanceOffset", 0.0);
+
+    public static final double bumperWidth = -0.1;
 
   }
 }

@@ -5,13 +5,13 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.Drive.AutoHeading;
+import frc.robot.subsystems.Drive.SetReefSideHeading;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Drive.FaceReefCenter;
+import frc.robot.subsystems.Drive.SetReefCenterHeading;
 import frc.robot.subsystems.Vision.ReefCentering;
 import frc.robot.subsystems.Vision.VisionBase;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
-import frc.robot.subsystems.Drive.FaceReefCenter;
+import frc.robot.subsystems.Drive.SetReefCenterHeading;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -36,8 +36,8 @@ public class RobotContainer {
   private final VisionIOLimelight visionIO = new VisionIOLimelight();
   private final VisionBase vision = new VisionBase(visionIO, drivetrain);
   private ReefCentering reefCentering = new ReefCentering(drivetrain, vision);
-  private final AutoHeading autoHeading = new AutoHeading(vision);
-  private final FaceReefCenter faceReefCenter = new FaceReefCenter(vision);
+  private final SetReefSideHeading autoHeading = new SetReefSideHeading(vision);
+  private final SetReefCenterHeading faceReefCenter = new SetReefCenterHeading(vision);
 
   private final SendableChooser<Command> autoChooser;
 
@@ -135,13 +135,17 @@ public class RobotContainer {
     }));
 
     m_driverController.povUp().whileTrue(
-        (reefCentering.createPathCommand(ReefCentering.Side.Middle).until(() -> reefCentering.haveConditionsChanged()).repeatedly()));
+        (reefCentering.createReefPathCommand(ReefCentering.Side.Middle).until(() -> reefCentering.haveReefConditionsChanged()).repeatedly()));
 
     m_driverController.leftBumper().whileTrue(
-        (reefCentering.createPathCommand(ReefCentering.Side.Left).until(() -> reefCentering.haveConditionsChanged()).repeatedly()));
+        (reefCentering.createReefPathCommand(ReefCentering.Side.Left).until(() -> reefCentering.haveReefConditionsChanged()).repeatedly()));
 
     m_driverController.rightBumper().whileTrue(
-        (reefCentering.createPathCommand(ReefCentering.Side.Right).until(() -> reefCentering.haveConditionsChanged()).repeatedly()));
+        (reefCentering.createReefPathCommand(ReefCentering.Side.Right).until(() -> reefCentering.haveReefConditionsChanged()).repeatedly()));
+
+    m_driverController.leftTrigger().whileTrue(
+        (reefCentering.createStationPathCommand().until(() -> reefCentering.haveStationConditionsChanged()).repeatedly()));
+
   }
 
   public Command getAutonomousCommand() {

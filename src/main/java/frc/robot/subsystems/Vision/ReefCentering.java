@@ -2,6 +2,7 @@ package frc.robot.subsystems.Vision;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ public class ReefCentering {
     private final CommandSwerveDrivetrain drivetrain;
     private VisionBase vision;
     private Pose2d nearestReefSide = new Pose2d();
+    private Pose2d nearestStation = new Pose2d();
 
     public enum Side{
         Left,
@@ -38,13 +40,8 @@ public class ReefCentering {
         this.drivetrain = drivetrain;
         this.vision = vision;
     }
-
-    public Rotation2d getTargetRotation(Side side) {
-        Pose2d nearest = calculateNearestSide();
-        return calculatePath(side, nearest).getRotation();
-    }
     
-    public Pose2d calculateNearestSide(){
+    public Pose2d calculateNearestReefSide(){
         if(vision.isRedAlliance()){
             return drivetrain.getPose().nearest(FieldPoses.redReefPoses);
         }
@@ -53,7 +50,16 @@ public class ReefCentering {
         }
     }
 
-    private Pose2d calculatePath(Side side, Pose2d nearestSide){
+    public Pose2d calculateNearestStation(){
+        if(vision.isRedAlliance()){
+            return drivetrain.getPose().nearest(FieldPoses.redCoralStations);
+        }
+        else{
+            return drivetrain.getPose().nearest(FieldPoses.blueCoralStations);
+        }
+    }
+
+    private Pose2d calculateReefPath(Side side, Pose2d nearestSide){
         double x = nearestSide.getX();
         double y = nearestSide.getY();
         double rot = nearestSide.getRotation().getRadians();
@@ -75,16 +81,33 @@ public class ReefCentering {
             break;
         }
 
-        x += FieldPoses.distanceOffset.get() * Math.cos(rot);
-        y += FieldPoses.distanceOffset.get() * Math.sin(rot);
+        x += (FieldPoses.distanceOffset.get() + FieldPoses.bumperWidth) * Math.cos(rot);
+        y += (FieldPoses.distanceOffset.get() + FieldPoses.bumperWidth) * Math.sin(rot);
 
          return new Pose2d(x, y, new Rotation2d(rot));
     }  
 
-    public boolean haveConditionsChanged(){
-        Pose2d nearSide = calculateNearestSide();
+    private Pose2d calculateStationPath(Pose2d nearestStation){
+        double x = nearestStation.getX();
+        double y = nearestStation.getY();
+        double rot = nearestStation.getRotation().getRadians();
+
+        x += FieldPoses.bumperWidth * Math.cos(rot);
+        y += FieldPoses.bumperWidth * Math.sin(rot);
+
+         return new Pose2d(x, y, new Rotation2d(rot));
+    }  
+
+    public boolean haveReefConditionsChanged(){
+        Pose2d nearSide = calculateNearestReefSide();
         
         return !nearSide.equals(nearestReefSide);
+    }
+
+    public boolean haveStationConditionsChanged(){
+        Pose2d nearStation = calculateNearestStation();
+        
+        return !nearStation.equals(nearestReefSide);
     }
 
     private Command getPathFromWaypoint(Pose2d waypoint){
@@ -115,11 +138,19 @@ public class ReefCentering {
         return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
       }
 
-    public Command createPathCommand(Side side){
+    public Command createReefPathCommand(Side side){
         return Commands.defer(()-> {
-            nearestReefSide = calculateNearestSide();
-            Pose2d align = calculatePath(side, nearestReefSide);
+            nearestReefSide = calculateNearestReefSide();
+            Pose2d align = calculateReefPath(side, nearestReefSide);
             return getPathFromWaypoint(align);
+        }, Set.of(drivetrain));
+    }
+
+    public Command createStationPathCommand(){
+        return Commands.defer(()-> {
+            nearestStation = calculateNearestStation();
+            Pose2d path = calculateStationPath(nearestStation);
+            return getPathFromWaypoint(path);
         }, Set.of(drivetrain));
     }
 }
