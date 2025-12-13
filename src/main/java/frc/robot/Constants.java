@@ -26,7 +26,7 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-    public static final double DEADBAND = 0.05;
+    public static final double DEADBAND = 0.1;
   }
 
   public static final String kLimelightName = "limelight";
@@ -83,7 +83,7 @@ public final class Constants {
     }};
     
     public static LoggedNetworkNumber lateralOffset = 
-        new LoggedNetworkNumber("ReefAlign/LateralOffset", 0.165);
+        new LoggedNetworkNumber("ReefAlign/LateralOffset", 0.2);
     public static LoggedNetworkNumber distanceOffset = 
         new LoggedNetworkNumber("ReefAlign/DistanceOffset", 0.2);
 
