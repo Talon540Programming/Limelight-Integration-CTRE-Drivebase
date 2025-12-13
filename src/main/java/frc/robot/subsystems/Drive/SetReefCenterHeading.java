@@ -56,7 +56,7 @@ public class SetReefCenterHeading extends SubsystemBase {
         double dy = reefCenter.getY() - currentPose.getY();
         
         // atan2 gives us the angle pointing toward the reef center
-        targetHeading = new Rotation2d((Math.atan2(dy, dx)) + Math.PI);
+        targetHeading = new Rotation2d((Math.atan2(dy, dx)));
 
         Logger.recordOutput("FaceReefCenter/TargetHeading", targetHeading.getDegrees());
         Logger.recordOutput("FaceReefCenter/ReefCenter", reefCenter);

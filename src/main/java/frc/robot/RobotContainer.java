@@ -8,10 +8,9 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Drive.SetReefSideHeading;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.SetReefCenterHeading;
-import frc.robot.subsystems.Vision.ReefCentering;
+import frc.robot.subsystems.Vision.DriveToPose;
 import frc.robot.subsystems.Vision.VisionBase;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
-import frc.robot.subsystems.Drive.SetReefCenterHeading;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -35,7 +34,7 @@ public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final VisionIOLimelight visionIO = new VisionIOLimelight();
   private final VisionBase vision = new VisionBase(visionIO, drivetrain);
-  private ReefCentering reefCentering = new ReefCentering(drivetrain, vision);
+  private DriveToPose driveToPose = new DriveToPose(drivetrain, vision);
   private final SetReefSideHeading autoHeading = new SetReefSideHeading(vision);
   private final SetReefCenterHeading faceReefCenter = new SetReefCenterHeading(vision);
 
@@ -135,16 +134,13 @@ public class RobotContainer {
     }));
 
     m_driverController.povUp().whileTrue(
-        (reefCentering.createReefPathCommand(ReefCentering.Side.Middle).until(() -> reefCentering.haveReefConditionsChanged()).repeatedly()));
+        (driveToPose.createReefPathCommand(DriveToPose.Side.Middle).until(() -> driveToPose.haveReefConditionsChanged()).repeatedly()));
 
     m_driverController.leftBumper().whileTrue(
-        (reefCentering.createReefPathCommand(ReefCentering.Side.Left).until(() -> reefCentering.haveReefConditionsChanged()).repeatedly()));
+        (driveToPose.createReefPathCommand(DriveToPose.Side.Left).until(() -> driveToPose.haveReefConditionsChanged()).repeatedly()));
 
     m_driverController.rightBumper().whileTrue(
-        (reefCentering.createReefPathCommand(ReefCentering.Side.Right).until(() -> reefCentering.haveReefConditionsChanged()).repeatedly()));
-
-    m_driverController.leftTrigger().whileTrue(
-        (reefCentering.createStationPathCommand().until(() -> reefCentering.haveStationConditionsChanged()).repeatedly()));
+        (driveToPose.createReefPathCommand(DriveToPose.Side.Right).until(() -> driveToPose.haveReefConditionsChanged()).repeatedly()));
 
   }
 
