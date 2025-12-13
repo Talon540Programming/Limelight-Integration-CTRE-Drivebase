@@ -7,9 +7,11 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Drive.AutoHeading;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Drive.FaceReefCenter;
 import frc.robot.subsystems.Vision.ReefCentering;
 import frc.robot.subsystems.Vision.VisionBase;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
+import frc.robot.subsystems.Drive.FaceReefCenter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -35,6 +37,7 @@ public class RobotContainer {
   private final VisionBase vision = new VisionBase(visionIO, drivetrain);
   private ReefCentering reefCentering = new ReefCentering(drivetrain, vision);
   private final AutoHeading autoHeading = new AutoHeading(vision);
+  private final FaceReefCenter faceReefCenter = new FaceReefCenter(vision);
 
   private final SendableChooser<Command> autoChooser;
 
@@ -65,39 +68,71 @@ public class RobotContainer {
     configureBindings();
     
     drivetrain.setDefaultCommand(
-      drivetrain.run(() -> {
-          double xSpeed = -m_driverController.getLeftY();
-          double ySpeed = -m_driverController.getLeftX();
-          double rotSpeed = -m_driverController.getRightX();
-          
-          if (autoHeading.isEnabled() && !autoHeading.isDriverRotating(rotSpeed)) {
-              autoHeading.updateTargetHeading(drivetrain.getPose());
-              
-              drivetrain.setControl(
-                  headingDrive
-                      .withVelocityX(xSpeed * MaxSpeed)
-                      .withVelocityY(ySpeed * MaxSpeed)
-                      .withTargetDirection(autoHeading.getTargetHeading())
-              );
-          } else {
-              drivetrain.setControl(
-                  drive
-                      .withVelocityX(xSpeed * MaxSpeed)
-                      .withVelocityY(ySpeed * MaxSpeed)
-                      .withRotationalRate(rotSpeed * MaxAngularRate)
-              );
-          }
-      })
-    );  
+        drivetrain.run(() -> {
+            double xSpeed = -m_driverController.getLeftY();
+            double ySpeed = -m_driverController.getLeftX();
+            double rotSpeed = -m_driverController.getRightX();
+            
+            // Check if driver is manually rotating - this always takes priority
+            boolean driverRotating = autoHeading.isDriverRotating(rotSpeed);
+            
+            // Determine which auto-heading mode to use (if any)
+            boolean useAutoHeading = autoHeading.isEnabled() && !faceReefCenter.isEnabled() && !driverRotating;
+            boolean useFaceReef = faceReefCenter.isEnabled() && !autoHeading.isEnabled() && !driverRotating;
+            
+            if (useAutoHeading) {
+                autoHeading.updateTargetHeading(drivetrain.getPose());
+                
+                drivetrain.setControl(
+                    headingDrive
+                        .withVelocityX(xSpeed * MaxSpeed)
+                        .withVelocityY(ySpeed * MaxSpeed)
+                        .withTargetDirection(autoHeading.getTargetHeading())
+                );
+            } else if (useFaceReef) {
+                faceReefCenter.updateTargetHeading(drivetrain.getPose());
+                
+                drivetrain.setControl(
+                    headingDrive
+                        .withVelocityX(xSpeed * MaxSpeed)
+                        .withVelocityY(ySpeed * MaxSpeed)
+                        .withTargetDirection(faceReefCenter.getTargetHeading())
+                );
+            } else {
+                drivetrain.setControl(
+                    drive
+                        .withVelocityX(xSpeed * MaxSpeed)
+                        .withVelocityY(ySpeed * MaxSpeed)
+                        .withRotationalRate(rotSpeed * MaxAngularRate)
+                );
+            }
+        })
+    );
+
     autoChooser = AutoBuilder.buildAutoChooser("default auto"); //pick a default
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   
   private void configureBindings() {
-    m_driverController.povDown().onTrue(Commands.runOnce(autoHeading::toggleAutoHeading));
     m_driverController.start().onTrue(Commands.runOnce(drivetrain::seedFieldCentric));
     m_driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
+
+    // Y button toggles face reef center - also disables auto heading if it's on
+    m_driverController.y().onTrue(Commands.runOnce(() -> {
+        if (autoHeading.isEnabled()) {
+            autoHeading.disableAutoHeading();
+        }
+        faceReefCenter.toggleFaceReef();
+    }));
+
+    // Update the existing povDown binding to also disable face reef
+    m_driverController.povDown().onTrue(Commands.runOnce(() -> {
+        if (faceReefCenter.isEnabled()) {
+            faceReefCenter.disableFaceReef();
+        }
+        autoHeading.toggleAutoHeading();
+    }));
 
     m_driverController.povUp().whileTrue(
         (reefCentering.createPathCommand(ReefCentering.Side.Middle).until(() -> reefCentering.haveConditionsChanged()).repeatedly()));

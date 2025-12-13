@@ -1,0 +1,77 @@
+package frc.robot.subsystems.Drive;
+
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FieldPoses;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.Vision.VisionBase;
+
+public class FaceReefCenter extends SubsystemBase {
+
+    private final VisionBase vision;
+    
+    private boolean faceReefEnabled = false;
+    private Rotation2d targetHeading = new Rotation2d();
+
+    public FaceReefCenter(VisionBase vision) {
+        this.vision = vision;
+    }
+
+    public void toggleFaceReef() {
+        faceReefEnabled = !faceReefEnabled;
+        Logger.recordOutput("FaceReefCenter/Enabled", faceReefEnabled);
+    }
+
+    public void enableFaceReef() {
+        faceReefEnabled = true;
+        Logger.recordOutput("FaceReefCenter/Enabled", faceReefEnabled);
+    }
+
+    public void disableFaceReef() {
+        faceReefEnabled = false;
+        Logger.recordOutput("FaceReefCenter/Enabled", faceReefEnabled);
+    }
+
+    public boolean isEnabled() {
+        return faceReefEnabled;
+    }
+
+    /**
+     * Updates the target heading to face the center of the reef.
+     * Calculates the angle from the robot's current position to the reef center.
+     * 
+     * @param currentPose The current pose of the robot
+     */
+    public void updateTargetHeading(Pose2d currentPose) {
+        // Get the appropriate reef center based on alliance
+        Pose2d reefCenter = vision.isRedAlliance() 
+            ? FieldPoses.redCenterOfReef 
+            : FieldPoses.blueCenterOfReef;
+
+        // Calculate the angle from robot to reef center
+        double dx = reefCenter.getX() - currentPose.getX();
+        double dy = reefCenter.getY() - currentPose.getY();
+        
+        // atan2 gives us the angle pointing toward the reef center
+        targetHeading = new Rotation2d((Math.atan2(dy, dx)) + Math.PI);
+
+        Logger.recordOutput("FaceReefCenter/TargetHeading", targetHeading.getDegrees());
+        Logger.recordOutput("FaceReefCenter/ReefCenter", reefCenter);
+    }
+
+    public Rotation2d getTargetHeading() {
+        return targetHeading;
+    }
+
+    public boolean isDriverRotating(double rotationInput) {
+        return Math.abs(rotationInput) > OperatorConstants.DEADBAND;
+    }
+
+    @Override
+    public void periodic() {
+        Logger.recordOutput("FaceReefCenter/Enabled", faceReefEnabled);
+    }
+}
