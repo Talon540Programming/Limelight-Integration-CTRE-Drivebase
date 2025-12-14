@@ -27,6 +27,7 @@ public class DriveToPose {
     private final CommandSwerveDrivetrain drivetrain;
     private static VisionBase vision;
         private Pose2d nearestReefSide = new Pose2d();
+        private Pose2d nearestStation = new Pose2d();
         
         public enum Side{
             Left,
@@ -45,6 +46,15 @@ public class DriveToPose {
             }
             else{
                 return drivetrain.getPose().nearest(FieldPoses.blueReefPoses);
+            }
+        }
+
+        public Pose2d calculateNearestStation(){
+            if(vision.isRedAlliance()){
+                return drivetrain.getPose().nearest(FieldPoses.redStationPoses);
+            }
+            else{
+                return drivetrain.getPose().nearest(FieldPoses.blueStationPoses);
             }
         }
     
@@ -75,11 +85,29 @@ public class DriveToPose {
     
              return new Pose2d(x, y, new Rotation2d(rot));
         }  
+
+        private Pose2d calculateStationPath(Pose2d station){
+            double x = station.getX();
+            double y = station.getY();
+            double rot = station.getRotation().getRadians();
+            //tune value with more testing, rotational offset 
+    
+            x += (FieldPoses.stationDistanceOffset.get() + FieldPoses.bumperWidth) * Math.cos(rot);
+            y += (FieldPoses.stationDistanceOffset.get() + FieldPoses.bumperWidth) * Math.sin(rot);
+    
+             return new Pose2d(x, y, new Rotation2d(rot));
+        }  
     
         public boolean haveReefConditionsChanged(){
             Pose2d nearSide = calculateNearestReefSide();
             
             return !nearSide.equals(nearestReefSide);
+        }
+
+        public boolean haveStationConditionsChanged(){
+            Pose2d station = calculateNearestStation();
+            
+            return !station.equals(nearestStation);
         }
     
         private Command getPathFromWaypoint(Pose2d waypoint){
@@ -92,7 +120,7 @@ public class DriveToPose {
     
             PathPlannerPath path = new PathPlannerPath(
                 waypoints, 
-                Constants.PathPlannerConstants.defaultConstraints, 
+                Constants.PathPlannerConstants.fastConstraints, 
                 //might have to add these methods
                 new IdealStartingState(drivetrain.getVelocityMagnitude(), drivetrain.getHeading()), 
                 new GoalEndState(0.0, waypoint.getRotation()));
@@ -116,6 +144,14 @@ public class DriveToPose {
         return Commands.defer(()-> {
             nearestReefSide = calculateNearestReefSide();
             Pose2d align = calculateReefPath(side, nearestReefSide);
+            return getPathFromWaypoint(align);
+        }, Set.of(drivetrain));
+    }
+
+    public Command createStationPathCommand(){
+        return Commands.defer(()-> {
+            nearestStation = calculateNearestStation();
+            Pose2d align = calculateStationPath(nearestStation);
             return getPathFromWaypoint(align);
         }, Set.of(drivetrain));
     }

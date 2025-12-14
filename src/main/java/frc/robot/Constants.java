@@ -53,8 +53,8 @@ public final class Constants {
         Units.degreesToRadians(200), Units.degreesToRadians(720));
 
     public static final PathConstraints fastConstraints = new PathConstraints(
-      Units.feetToMeters(14), 4.0,
-        Units.degreesToRadians(360), Units.degreesToRadians(720));
+      Units.feetToMeters(14), 8.0,
+        Units.degreesToRadians(600), Units.degreesToRadians(1000));
   }
 
   public static final class FieldPoses {
@@ -73,6 +73,11 @@ public final class Constants {
       add(new Pose2d(3.896, 5.053, new Rotation2d(Units.degreesToRadians(300.0))));  // Face 5
     }};
 
+  public static final List<Pose2d> blueStationPoses = new ArrayList<Pose2d>(){{
+    add(new Pose2d(1.38, 6.8, new Rotation2d(Units.degreesToRadians(-54)))); // Left Station
+    add(new Pose2d(1.38, 1.19, new Rotation2d(Units.degreesToRadians(54)))); // Red Station
+  }};
+
     
   public static final List<Pose2d> redReefPoses = new ArrayList<Pose2d>(){{
       add(new Pose2d(11.877, 4.026, new Rotation2d(Units.degreesToRadians(0))));     // Face 0
@@ -83,13 +88,20 @@ public final class Constants {
       add(new Pose2d(12.472, 5.053, new Rotation2d(Units.degreesToRadians(300.0)))); // Face 5
   }};
 
-
+  public static final List<Pose2d> redStationPoses = new ArrayList<Pose2d>(){{
+    add(new Pose2d(16.34, 1.19, new Rotation2d(Units.degreesToRadians(126)))); // Left Station
+    add(new Pose2d(16.34, 6.8, new Rotation2d(Units.degreesToRadians(-126)))); // Red Station
+  }};
 
   
     
     public static LoggedNetworkNumber reefLateralOffset = 
         new LoggedNetworkNumber("ReefAlign/LateralOffset", 0.2);
     public static LoggedNetworkNumber reefDistanceOffset = 
+        new LoggedNetworkNumber("ReefAlign/ReefDistanceOffset", 0.0);
+        public static LoggedNetworkNumber stationLateralOffset = 
+        new LoggedNetworkNumber("ReefAlign/LateralOffset", 0.2);
+    public static LoggedNetworkNumber stationDistanceOffset = 
         new LoggedNetworkNumber("ReefAlign/ReefDistanceOffset", 0.0);
         
     public static final double bumperWidth = -0.1;

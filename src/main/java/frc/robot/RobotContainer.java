@@ -142,6 +142,9 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(
         (driveToPose.createReefPathCommand(DriveToPose.Side.Right).until(() -> driveToPose.haveReefConditionsChanged()).repeatedly()));
 
+    m_driverController.leftTrigger().whileTrue(
+        (driveToPose.createStationPathCommand().until(() -> driveToPose.haveStationConditionsChanged()).repeatedly()));
+
   }
 
   public Command getAutonomousCommand() {
