@@ -120,7 +120,7 @@ public class DriveToPose {
     
             PathPlannerPath path = new PathPlannerPath(
                 waypoints, 
-                Constants.PathPlannerConstants.fastConstraints, 
+                Constants.PathPlannerConstants.defaultConstraints, 
                 //might have to add these methods
                 new IdealStartingState(drivetrain.getVelocityMagnitude(), drivetrain.getHeading()), 
                 new GoalEndState(0.0, waypoint.getRotation()));
