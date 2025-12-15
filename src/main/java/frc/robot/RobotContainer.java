@@ -74,10 +74,13 @@ public class RobotContainer {
             
             // Check if driver is manually rotating - this always takes priority
             boolean driverRotating = autoHeading.isDriverRotating(rotSpeed);
+
+            boolean atSetpoint = driveToPose.isAtSetpoint(0.3);
             
             // Determine which auto-heading mode to use (if any)
-            boolean useAutoHeading = autoHeading.isEnabled() && !faceReefCenter.isEnabled() && !driverRotating;
-            boolean useFaceReef = faceReefCenter.isEnabled() && !autoHeading.isEnabled() && !driverRotating;
+            boolean useAutoHeading = autoHeading.isEnabled() && !faceReefCenter.isEnabled() && !driverRotating && !atSetpoint;
+            boolean useFaceReef = faceReefCenter.isEnabled() && !autoHeading.isEnabled() && !driverRotating && !atSetpoint;
+
             
             if (useAutoHeading) {
                 autoHeading.updateTargetHeading(drivetrain.getPose());

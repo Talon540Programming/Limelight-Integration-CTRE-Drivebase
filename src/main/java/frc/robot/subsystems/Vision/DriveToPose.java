@@ -151,10 +151,21 @@ public class DriveToPose {
             // If robot is moving, use velocity direction to create smooth path
             return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
         }
+
+        public boolean isAtSetpoint(double toleranceMeters) {
+            Pose2d currentPose = drivetrain.getPose();
+            
+            // Check distance to nearest reef
+            Pose2d nearestReef = calculateNearestReefSide();
+            double reefDistance = currentPose.getTranslation().getDistance(nearestReef.getTranslation());
+            
+            // Check distance to nearest station
+            Pose2d nearestStation = calculateNearestStation();
+            double stationDistance = currentPose.getTranslation().getDistance(nearestStation.getTranslation());
+            
+            return reefDistance < toleranceMeters || stationDistance < toleranceMeters;
+        }
         
-
-
-
     public Command createReefPathCommand(Side side){
         return Commands.defer(()-> {
             nearestReefSide = calculateNearestReefSide();
