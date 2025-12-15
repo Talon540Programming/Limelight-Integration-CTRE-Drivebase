@@ -98,7 +98,7 @@ public final class Constants {
     public static LoggedNetworkNumber reefLateralOffset = 
         new LoggedNetworkNumber("ReefAlign/LateralOffset", 0.2);
     public static LoggedNetworkNumber reefDistanceOffset = 
-        new LoggedNetworkNumber("ReefAlign/ReefDistanceOffset", 0.0);
+        new LoggedNetworkNumber("ReefAlign/ReefDistanceOffset", -0.05);
         public static LoggedNetworkNumber stationLateralOffset = 
         new LoggedNetworkNumber("ReefAlign/LateralOffset", 0.2);
     public static LoggedNetworkNumber stationDistanceOffset = 

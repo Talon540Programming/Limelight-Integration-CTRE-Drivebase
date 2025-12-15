@@ -111,32 +111,47 @@ public class DriveToPose {
         }
     
         private Command getPathFromWaypoint(Pose2d waypoint){
-            List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-                new Pose2d(drivetrain.getPose().getTranslation(), getPathVelocityHeading(drivetrain.getFieldVelocity(), waypoint)), waypoint);
+            // Calculate approach direction (from robot toward target)
+            var approachDirection = waypoint.getTranslation().minus(drivetrain.getPose().getTranslation()).getAngle();
             
-            if(waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor())< 0.01 ){
+            List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+                new Pose2d(drivetrain.getPose().getTranslation(), getPathVelocityHeading(drivetrain.getFieldVelocity(), waypoint)),
+                new Pose2d(waypoint.getTranslation(), approachDirection)  // Approach FROM robot's direction, not final heading
+            );
+            
+            if(waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < 0.01){
                 return Commands.print("Auto alignment too close to desired position to continue");
             }
-    
+        
             PathPlannerPath path = new PathPlannerPath(
                 waypoints, 
-                Constants.PathPlannerConstants.defaultConstraints, 
-                //might have to add these methods
-                new IdealStartingState(drivetrain.getVelocityMagnitude(), drivetrain.getHeading()), 
-                new GoalEndState(0.0, waypoint.getRotation()));
+                Constants.PathPlannerConstants.defaultConstraints,
+                new IdealStartingState(Math.max(drivetrain.getVelocityMagnitude().in(MetersPerSecond), 1.0), drivetrain.getHeading()), 
+                new GoalEndState(0.0, waypoint.getRotation()));  // Final ROBOT heading stays here
             
             path.preventFlipping = true;
-    
+        
             return AutoBuilder.followPath(path);
         }
         //going to have to look into the drivetrain methods / make some
         private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
-            if (drivetrain.getVelocityMagnitude().in(MetersPerSecond) < 0.25) {
-                var diff = target.minus(drivetrain.getPose()).getTranslation();
-                return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();
+            // Calculate direction toward target
+            var diff = target.getTranslation().minus(drivetrain.getPose().getTranslation());
+            
+            // If very close to target, use direction toward target (or current heading if basically on top of it)
+            if (diff.getNorm() < 0.01) {
+                return drivetrain.getPose().getRotation();
             }
+            
+            // If robot is moving slowly, point path toward target
+            if (drivetrain.getVelocityMagnitude().in(MetersPerSecond) < 0.25) {
+                return diff.getAngle();
+            }
+            
+            // If robot is moving, use velocity direction to create smooth path
             return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
-          }
+        }
+        
 
 
 
