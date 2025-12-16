@@ -37,9 +37,13 @@ public class VisionBase extends SubsystemBase{
             
             // Reject if pose jumped too far from current estimate (possible glitch)
             double poseDelta = drivetrain.getPose().getTranslation()
-                .getDistance(limelight.pose.getTranslation());
-            if (poseDelta > 1.5) {  // More than 1.5 meters is suspicious
-                Logger.recordOutput("Vision/Rejected", "Pose jumped too far");
+            .getDistance(limelight.pose.getTranslation());
+
+            // Allow big corrections when vision is confident
+            boolean visionIsConfident = limelight.seenTagCount >= 1 && limelight.avgTagDistance < 3.0;
+
+            if (poseDelta > 1.5 && !visionIsConfident) {
+                Logger.recordOutput("Vision/Rejected", "Large jump with low confidence");
                 return;
             }
             
