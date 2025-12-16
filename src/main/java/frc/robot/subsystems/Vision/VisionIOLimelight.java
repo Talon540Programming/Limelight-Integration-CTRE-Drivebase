@@ -34,6 +34,7 @@ public class VisionIOLimelight implements VisionIO {
             input.pose = metaTag2Pose.pose;
             input.limelightTimestamp = metaTag2Pose.timestampSeconds;
             input.seenTagCount = metaTag2Pose.tagCount;
+            input.avgTagDistance = metaTag2Pose.avgTagDist;
         }
         else{
             input.seenTagCount = 0;

@@ -133,7 +133,7 @@ public class DriveToPose {
         
             return AutoBuilder.followPath(path);
         }
-        //going to have to look into the drivetrain methods / make some
+        
         private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
             // Calculate direction toward target
             var diff = target.getTranslation().minus(drivetrain.getPose().getTranslation());

@@ -17,6 +17,7 @@ public interface VisionIO {
         public double limelightTimestamp = 0.0;
         public int seenTagCount = 0;
         public boolean isRedAlliance = false;
+        public double avgTagDistance = 0.0;
     }
 
     default void updateVisionIOInputs(VisionIOInputs io){}
