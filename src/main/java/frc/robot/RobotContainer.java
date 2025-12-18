@@ -4,13 +4,20 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.subsystems.Vision.ReefCentering;
+import frc.robot.subsystems.Drive.SetReefSideHeading;
+import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Drive.SetReefCenterHeading;
+import frc.robot.subsystems.Vision.DriveToPose;
 import frc.robot.subsystems.Vision.VisionBase;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import frc.robot.generated.TunerConstants;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,20 +33,87 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final CommandSwerveDrivetrain drivetrain = new CommandSwerveDrivetrain();
+  private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final VisionIOLimelight visionIO = new VisionIOLimelight();
   private final VisionBase vision = new VisionBase(visionIO, drivetrain);
-  private ReefCentering reefCentering = new ReefCentering(drivetrain, vision);
+  private DriveToPose driveToPose = new DriveToPose(drivetrain, vision);
+  private final SetReefSideHeading autoHeading = new SetReefSideHeading(vision);
+  private final SetReefCenterHeading faceReefCenter = new SetReefCenterHeading(vision);
 
   private final SendableChooser<Command> autoChooser;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  
+  private static final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(edu.wpi.first.units.Units.MetersPerSecond);
+  private double MaxAngularRate = RotationsPerSecond.of(3).in(RadiansPerSecond);
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(MaxSpeed * 0.1)
+      .withRotationalDeadband(MaxAngularRate * 0.1)
+      .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage);
+  
+  private final SwerveRequest.FieldCentricFacingAngle headingDrive = new SwerveRequest.FieldCentricFacingAngle()
+      .withDeadband(MaxSpeed * 0.1)
+      .withRotationalDeadband(MaxAngularRate * 0.1)
+      .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage);
+  
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
+  private final Telemetry logger = new Telemetry(MaxSpeed);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    headingDrive.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+    headingDrive.HeadingController.setPID(11, 0.1, 0.5);
+
     configureBindings();
+    
+    drivetrain.setDefaultCommand(
+        drivetrain.run(() -> {
+            double xSpeed = -m_driverController.getLeftY();
+            double ySpeed = -m_driverController.getLeftX();
+            double rotSpeed = -m_driverController.getRightX();
+            
+            // Check if driver is manually rotating - this always takes priority
+            boolean driverRotating = autoHeading.isDriverRotating(rotSpeed);
+
+            boolean atSetpoint = driveToPose.isAtSetpoint(0.3);
+            
+            // Determine which auto-heading mode to use (if any)
+            boolean useAutoHeading = autoHeading.isEnabled() && !faceReefCenter.isEnabled() && !driverRotating && !atSetpoint;
+            boolean useFaceReef = faceReefCenter.isEnabled() && !autoHeading.isEnabled() && !driverRotating && !atSetpoint;
+
+            
+            if (useAutoHeading) {
+                autoHeading.updateTargetHeading(drivetrain.getPose());
+                
+                drivetrain.setControl(
+                    headingDrive
+                        .withVelocityX(xSpeed * MaxSpeed)
+                        .withVelocityY(ySpeed * MaxSpeed)
+                        .withTargetDirection(autoHeading.getTargetHeading())
+                );
+            } else if (useFaceReef) {
+                faceReefCenter.updateTargetHeading(drivetrain.getPose());
+                
+                drivetrain.setControl(
+                    headingDrive
+                        .withVelocityX(xSpeed * MaxSpeed)
+                        .withVelocityY(ySpeed * MaxSpeed)
+                        .withTargetDirection(faceReefCenter.getTargetHeading())
+                );
+            } else {
+                drivetrain.setControl(
+                    drive
+                        .withVelocityX(xSpeed * MaxSpeed)
+                        .withVelocityY(ySpeed * MaxSpeed)
+                        .withRotationalRate(rotSpeed * MaxAngularRate)
+                );
+            }
+        })
+    );
+
     autoChooser = AutoBuilder.buildAutoChooser("default auto"); //pick a default
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -47,9 +121,37 @@ public class RobotContainer {
   
   private void configureBindings() {
     m_driverController.start().onTrue(Commands.runOnce(drivetrain::seedFieldCentric));
-    m_driverController.povUp().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Middle).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
-    m_driverController.leftBumper().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Left).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
-    m_driverController.rightBumper().whileTrue(reefCentering.createPathCommand(ReefCentering.Side.Right).until(() -> reefCentering.haveConditionsChanged()).repeatedly());
+    m_driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
+
+    // Y button toggles face reef center - also disables auto heading if it's on
+    m_driverController.y().onTrue(Commands.runOnce(() -> {
+        if (autoHeading.isEnabled()) {
+            autoHeading.disableAutoHeading();
+        }
+        faceReefCenter.toggleFaceReef();
+    }));
+
+    // Update the existing povDown binding to also disable face reef
+    m_driverController.povDown().onTrue(Commands.runOnce(() -> {
+        if (faceReefCenter.isEnabled()) {
+            faceReefCenter.disableFaceReef();
+        }
+        autoHeading.toggleAutoHeading();
+    }));
+
+    m_driverController.povUp().whileTrue(
+        (driveToPose.createReefPathCommand(DriveToPose.Side.Middle).until(() -> driveToPose.haveReefConditionsChanged()).repeatedly()));
+
+    m_driverController.leftBumper().whileTrue(
+        (driveToPose.createReefPathCommand(DriveToPose.Side.Left).until(() -> driveToPose.haveReefConditionsChanged()).repeatedly()));
+
+    m_driverController.rightBumper().whileTrue(
+        (driveToPose.createReefPathCommand(DriveToPose.Side.Right).until(() -> driveToPose.haveReefConditionsChanged()).repeatedly()));
+
+    m_driverController.leftTrigger().whileTrue(
+        (driveToPose.createStationPathCommand().until(() -> driveToPose.haveStationConditionsChanged()).repeatedly()));
+
+        drivetrain.registerTelemetry(logger::telemeterize);
 
   }
 

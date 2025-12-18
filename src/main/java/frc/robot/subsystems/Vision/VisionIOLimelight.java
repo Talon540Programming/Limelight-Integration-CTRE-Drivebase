@@ -3,6 +3,7 @@ package frc.robot.subsystems.Vision;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 
 public class VisionIOLimelight implements VisionIO {
     private final String limelightName = Constants.kLimelightName;
@@ -33,6 +34,7 @@ public class VisionIOLimelight implements VisionIO {
             input.pose = metaTag2Pose.pose;
             input.limelightTimestamp = metaTag2Pose.timestampSeconds;
             input.seenTagCount = metaTag2Pose.tagCount;
+            input.avgTagDistance = metaTag2Pose.avgTagDist;
         }
         else{
             input.seenTagCount = 0;

@@ -3,6 +3,7 @@ package frc.robot.subsystems.Vision;
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 
 public interface VisionIO {
 
@@ -16,6 +17,7 @@ public interface VisionIO {
         public double limelightTimestamp = 0.0;
         public int seenTagCount = 0;
         public boolean isRedAlliance = false;
+        public double avgTagDistance = 0.0;
     }
 
     default void updateVisionIOInputs(VisionIOInputs io){}
