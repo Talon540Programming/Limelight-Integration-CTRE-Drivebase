@@ -344,6 +344,36 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, 
         resetRotation(new Rotation2d());
     }
 
+    /**
+ * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
+ * while still accounting for measurement noise.
+ *
+ * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
+ * @param timestampSeconds The timestamp of the vision measurement in seconds.
+ */
+@Override
+public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+    super.addVisionMeasurement(visionRobotPoseMeters, com.ctre.phoenix6.Utils.fpgaToCurrentTime(timestampSeconds));
+}
+
+/**
+ * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
+ * while still accounting for measurement noise.
+ *
+ * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
+ * @param timestampSeconds The timestamp of the vision measurement in seconds.
+ * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement
+ *     in the form [x, y, theta]ᵀ, with units in meters and radians.
+ */
+@Override
+public void addVisionMeasurement(
+    Pose2d visionRobotPoseMeters,
+    double timestampSeconds,
+    Matrix<N3, N1> visionMeasurementStdDevs
+) {
+    super.addVisionMeasurement(visionRobotPoseMeters, com.ctre.phoenix6.Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
+}
+
     /* Simulation support */
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Thread m_simThread;
