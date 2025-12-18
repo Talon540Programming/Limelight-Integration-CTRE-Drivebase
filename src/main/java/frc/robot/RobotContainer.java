@@ -65,7 +65,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     headingDrive.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
-    headingDrive.HeadingController.setPID(7, 0, 0);
+    headingDrive.HeadingController.setPID(11, 0.1, 0.5);
 
     configureBindings();
     

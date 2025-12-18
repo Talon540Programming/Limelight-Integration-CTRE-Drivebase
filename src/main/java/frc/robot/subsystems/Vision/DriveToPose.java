@@ -126,7 +126,7 @@ public class DriveToPose extends SubsystemBase{
         
             PathPlannerPath path = new PathPlannerPath(
                 waypoints, 
-                Constants.PathPlannerConstants.defaultConstraints,
+                Constants.PathPlannerConstants.fastConstraints,
                 new IdealStartingState(Math.max(drivetrain.getVelocityMagnitude().in(MetersPerSecond), 1.0), drivetrain.getHeading()), 
                 new GoalEndState(0.0, waypoint.getRotation()));  // Final ROBOT heading stays here
             
