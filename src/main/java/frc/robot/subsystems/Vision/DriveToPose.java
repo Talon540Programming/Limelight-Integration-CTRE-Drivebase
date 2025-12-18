@@ -16,16 +16,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldPoses;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 
 
 
-public class DriveToPose {
+public class DriveToPose extends SubsystemBase{
 
-    private final CommandSwerveDrivetrain drivetrain;
-    private static VisionBase vision;
+        private final CommandSwerveDrivetrain drivetrain;
+        private VisionBase vision;
         private Pose2d nearestReefSide = new Pose2d();
         private Pose2d nearestStation = new Pose2d();
         
@@ -37,7 +38,7 @@ public class DriveToPose {
     
         public DriveToPose(CommandSwerveDrivetrain drivetrain,VisionBase vision){
             this.drivetrain = drivetrain;
-            DriveToPose.vision = vision;
+            this.vision = vision;
         }
         
         public Pose2d calculateNearestReefSide(){
