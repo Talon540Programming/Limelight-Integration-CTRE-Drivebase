@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Drive.SetReefSideHeading;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
@@ -45,8 +47,7 @@ public class RobotContainer {
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   
   private static final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(edu.wpi.first.units.Units.MetersPerSecond);
-  private static final double MaxAngularRate = Math.PI * 2; // 1 rotation per second
-  
+  private double MaxAngularRate = RotationsPerSecond.of(3).in(RadiansPerSecond);
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1)
       .withRotationalDeadband(MaxAngularRate * 0.1)
@@ -58,6 +59,8 @@ public class RobotContainer {
       .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage);
   
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
+  private final Telemetry logger = new Telemetry(MaxSpeed);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -147,6 +150,8 @@ public class RobotContainer {
 
     m_driverController.leftTrigger().whileTrue(
         (driveToPose.createStationPathCommand().until(() -> driveToPose.haveStationConditionsChanged()).repeatedly()));
+
+        drivetrain.registerTelemetry(logger::telemeterize);
 
   }
 
